@@ -1,0 +1,17 @@
+CHIWA(1)
+========
+slowpoke <mail+git@slowpoke.io>
+:encoding: utf-8
+:doctype: manpage
+:man source: Tinfoil Wizards Inc.
+
+NAME
+----
+chiwa - change i3 wallpapers automatically.
+
+DESCRIPTION
+-----------
+This program manages per-output wallpapers using i3's IPC interface, more
+specifically by subscribing to the output event and reacting to changes. You can
+configure a wallpaper for every output you use with a simple, JSON based
+configuration file, or directly over the command line interface.
