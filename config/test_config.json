@@ -1,0 +1,17 @@
+{
+    "global": {},
+    "wallpaper": {
+        "LVDS1": {
+            "mode" : "derp",
+            "image" : "/path/to/image.png"
+        },
+        "VGA1": {
+            "mode" : "center",
+            "images": {
+                "1920x1080" : "/path/to/image.png",
+                "1280x720" : "/path/to/different/image.png",
+                "default" : "/path/to/default/image.png"
+            }
+        }
+    }
+}
