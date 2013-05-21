@@ -54,7 +54,32 @@ func OutputRect(X *xgbutil.XUtil, output randr.Output) (image.Rectangle, error) 
 	x, y := int(crtc.X), int(crtc.Y)
 	w, h := int(crtc.Width), int(crtc.Height)
 	return image.Rectangle{
-		image.Point{x, x + w},
-		image.Point{y, y + h},
+		image.Point{x, y},
+		image.Point{x + w, y + h},
 	}, nil
+}
+
+// GetOutputByName fetches an output by name.
+// FIXME: It's really ugly to just throw away the OutputInfo after using it. See
+// if there's a better way to do this.
+func GetOutputByName(X *xgbutil.XUtil, name string) (randr.Output, error) {
+	res, err := randr.GetScreenResources(X.Conn(), X.RootWin()).Reply()
+	if err != nil {
+		return 0, err
+	}
+	var (
+		oinfo  *randr.GetOutputInfoReply
+		output randr.Output
+	)
+	for _, output = range res.Outputs {
+		oinfo, err = randr.GetOutputInfo(X.Conn(), output, 0).Reply()
+		if err != nil {
+			return 0, err
+		}
+		// See if we've found the correct output.
+		if string(oinfo.Name) == name {
+			break
+		}
+	}
+	return output, nil
 }

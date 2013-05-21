@@ -14,17 +14,41 @@ import (
 	"testing"
 
 	"github.com/BurntSushi/xgb/randr"
+
+	//"github.com/BurntSushi/xgbutil/xevent"
 	"github.com/BurntSushi/xgbutil"
+	"github.com/BurntSushi/xgbutil/xgraphics"
 )
 
 func TestNewBG(t *testing.T) {
 	X, err := xgbutil.NewConn()
-	randr.Init(X.Conn())
 	if err != nil {
 		t.Errorf("%s\n", err)
 	}
+	randr.Init(X.Conn())
 	_, err = NewBackground(X)
 	if err != nil {
 		t.Errorf("%s\n", err)
 	}
+}
+
+func TestSetImg(t *testing.T) {
+	X, err := xgbutil.NewConn()
+	if err != nil {
+		t.Errorf("%s\n", err)
+	}
+	randr.Init(X.Conn())
+	bg, err := NewBackground(X)
+
+	img, err := xgraphics.NewFileName(X, "kos-mos.png")
+	if err != nil {
+		t.Errorf("%s\n", err)
+	}
+	if err = SetImageToBg(X, bg, img, "LVDS1"); err != nil {
+		t.Errorf("%s\n", err)
+	}
+
+	//win := bg.XShowExtra("test", true)
+	//bg.XPaint(win.Id)
+	//xevent.Main(X)
 }

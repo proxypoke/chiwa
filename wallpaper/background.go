@@ -12,6 +12,7 @@ package wallpaper
 
 import (
 	"image"
+	"image/draw"
 
 	"github.com/proxypoke/chiwa/util"
 
@@ -31,10 +32,34 @@ func NewBackground(X *xgbutil.XUtil) (*xgraphics.Image, error) {
 	var bgRect image.Rectangle
 	for _, output := range res.Outputs {
 		r, err := util.OutputRect(X, output)
+		// NOTE: It doesn't really matter if this returns a Zero Rectangle.
 		if err != nil {
 			return nil, err
 		}
 		bgRect = bgRect.Union(r)
 	}
 	return xgraphics.New(X, bgRect), nil
+}
+
+// SetImageToBg sets the given image into the background at the proper location
+// for the named output to display.
+func SetImageToBg(X *xgbutil.XUtil,
+	bg *xgraphics.Image,
+	img image.Image,
+	name string) error {
+
+	output, err := util.GetOutputByName(X, name)
+	if err != nil {
+		return err
+	}
+	geom, err := util.OutputRect(X, output)
+	if err != nil {
+		return err
+	}
+	if err = bg.CreatePixmap(); err != nil {
+		return err
+	}
+	bg.XDraw()
+	draw.Draw(bg, geom, img, img.Bounds().Min, draw.Src)
+	return nil
 }
