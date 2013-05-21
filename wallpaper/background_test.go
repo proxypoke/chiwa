@@ -10,6 +10,8 @@
 
 package wallpaper
 
+// TODO: Several of the tests assume that the primary display is LVDS1.
+
 import (
 	"testing"
 
@@ -32,12 +34,15 @@ func TestNewBG(t *testing.T) {
 	}
 }
 
-func TestSetImg(t *testing.T) {
-	X, err := xgbutil.NewConn()
-	if err != nil {
-		t.Errorf("%s\n", err)
-	}
+func setup() *xgbutil.XUtil {
+	X, _ := xgbutil.NewConn()
 	randr.Init(X.Conn())
+	return X
+}
+
+
+func TestSetImg(t *testing.T) {
+	X := setup()
 	bg, err := NewBackground(X)
 
 	img, err := xgraphics.NewFileName(X, "kos-mos.png")
@@ -52,3 +57,19 @@ func TestSetImg(t *testing.T) {
 	//bg.XPaint(win.Id)
 	//xevent.Main(X)
 }
+
+func TestSetRoot(t *testing.T) {
+	X := setup()
+	bg, err := NewBackground(X)
+	if err != nil {
+		t.Errorf("%s\n", err)
+	}
+	// Errors in these functions are tested by TestSetImg, so we ignore them.
+	img, _ := xgraphics.NewFileName(X, "kos-mos.png")
+	SetImageToBg(X, bg, img, "LVDS1")
+
+	if err = SetRoot(X, bg); err != nil {
+		t.Errorf("%s\n", err)
+	}
+}
+

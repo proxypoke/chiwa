@@ -20,6 +20,7 @@ import (
 
 	"github.com/BurntSushi/xgbutil"
 	"github.com/BurntSushi/xgbutil/xgraphics"
+	"github.com/BurntSushi/xgbutil/xprop"
 )
 
 // NewBackground creates an xgraphics.Image which spans the entire screen,
@@ -61,5 +62,17 @@ func SetImageToBg(X *xgbutil.XUtil,
 	}
 	bg.XDraw()
 	draw.Draw(bg, geom, img, img.Bounds().Min, draw.Src)
+	return nil
+}
+
+// SetRoot sets the given background as the root window background.
+func SetRoot(X *xgbutil.XUtil, bg *xgraphics.Image) error {
+	root := X.RootWin()
+	if err := bg.XSurfaceSet(root); err != nil {
+		return err
+	}
+	bg.XDraw()
+	bg.XPaint(root)
+	xprop.ChangeProp32(X, root, "_XROOTPMAP_ID", "PIXMAP", uint(bg.Pixmap))
 	return nil
 }
