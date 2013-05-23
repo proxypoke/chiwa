@@ -73,6 +73,9 @@ func SetRoot(X *xgbutil.XUtil, bg *xgraphics.Image) error {
 	}
 	bg.XDraw()
 	bg.XPaint(root)
+	// FIXME: This doesn't set the pixmap persistently. As soon as the program
+	// exits, the pixmap is destroyed. Find a way to make it persistent.
 	xprop.ChangeProp32(X, root, "_XROOTPMAP_ID", "PIXMAP", uint(bg.Pixmap))
+	xprop.ChangeProp32(X, root, "ESETROOT_PMAP_ID", "PIXMAP", uint(bg.Pixmap))
 	return nil
 }
