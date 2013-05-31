@@ -15,7 +15,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
+
+	"github.com/proxypoke/chiwa/logging"
+)
+
+var (
+	configName string = "chiwarc.json"
 )
 
 // Read tries reading a config from the given file.
@@ -39,6 +46,49 @@ func Write(path string, conf *Config) error {
 		return err
 	}
 	return ioutil.WriteFile(path, toWrite, os.FileMode(0744))
+}
+
+// LocateConfig tries to find a configuration file for chiwa, returning its
+// filepath or an empty string.
+func LocateConfig() string {
+	var configPath string
+	// First, look in the user's home directory.
+	home := os.Getenv("HOME")
+	logging.Debugf("$HOME == %s\n", home)
+	if home == "" {
+		logging.Warnf("$HOME is unset (this is not good).")
+		return ""
+	} else {
+		// Try the standard location first.
+		configPath = path.Join(home, "." + configName)
+		logging.Debugf("Trying %s...\n", configPath)
+		if fileExists(configPath) {
+			return configPath
+		}
+
+		// Try $HOME/.config/chiwa.
+		configPath = path.Join(home, ".config", "chiwa", configName)
+		if fileExists(configPath) {
+			return configPath
+		}
+	}
+
+	// Finally, look in /etc.
+	configPath = path.Join("/etc", configName)
+	if fileExists(configPath) {
+		return configPath
+	}
+	// We haven't found anything.
+	return ""
+}
+
+// Check if a file exists.
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 // Verify checks the given config for invalid values.
